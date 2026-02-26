@@ -2,7 +2,7 @@
   "name": "antigravity-quota-watcher",
   "displayName": "Antigravity Quota Watcher",
   "description": "实时监控 Antigravity的模型使用配额（displays AI model quota status in the status bar）",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "publisher": "wusimpl",
   "icon": "icon.png",
   "engines": {
