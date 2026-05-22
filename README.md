@@ -60,15 +60,15 @@
   <tr>
     <td align="center">
       <strong>状态栏显示</strong><br><br>
-      <img src="https://raw.githubusercontent.com/wusimpl/AntigravityQuotaWatcher/main/images/demo1.png" alt="状态栏显示" width="300">
+      <img src="https://raw.githubusercontent.com/yinuo0602/AntigravityQuotaWatcher-v2/main/images/demo1.png" alt="状态栏显示" width="300">
     </td>
     <td align="center">
       <strong>配额详情</strong><br><br>
-      <img src="https://raw.githubusercontent.com/wusimpl/AntigravityQuotaWatcher/main/images/demo2.png" alt="配额详情" width="400">
+      <img src="https://raw.githubusercontent.com/yinuo0602/AntigravityQuotaWatcher-v2/main/images/demo2.png" alt="配额详情" width="400">
     </td>
     <td align="center">
       <strong>配置页面<a href="./CONFIG.md">(配置文档)</a></strong><br><br>
-      <img src="https://raw.githubusercontent.com/wusimpl/AntigravityQuotaWatcher/main/images/demo3.png" alt="配置页面" width="400">
+      <img src="https://raw.githubusercontent.com/yinuo0602/AntigravityQuotaWatcher-v2/main/images/demo3.png" alt="配置页面" width="400">
     </td>
   </tr>
 </table>
@@ -80,18 +80,9 @@
 ![Linux](https://img.shields.io/badge/Linux-支持-brightgreen?logo=linux&logoColor=white)
 ![Windows ARM](https://img.shields.io/badge/Windows--arm64-不支持-red?logo=microsoftwindows&logoColor=white)
 
-## 安装方法
+### 安装步骤
 
-
-### 方式一：插件市场安装（推荐）
-
-在插件市场搜索 `wusimpl Antigravity Quota Watcher @sort:name`，认准作者为 `wusimpl` 的插件，点击安装即可。
-
-![OpenVSX-Search PNG](./images/openvsx-search.png)
-
-### 方式二：手动安装
-
-[下载插件](https://github.com/wusimpl/AntigravityQuotaWatcher/releases/latest)，然后安装插件，重启 Antigravity
+[下载插件](https://github.com/yinuo0602/AntigravityQuotaWatcher-v2/releases/latest)，然后安装插件，重启 Antigravity
 
 ![Installation](https://raw.githubusercontent.com/yinuo0602/AntigravityQuotaWatcher-v2/main/images/install.png)
 
@@ -106,8 +97,8 @@
 请在提交issue时附上日志文件或者日志截图
 
 日志导出方法：
-![步骤页面1](https://raw.githubusercontent.com/wusimpl/AntigravityQuotaWatcher/main/images/issue1.png)
-![步骤页面2](https://raw.githubusercontent.com/wusimpl/AntigravityQuotaWatcher/main/images/issue2.png)
+![步骤页面1](https://raw.githubusercontent.com/yinuo0602/AntigravityQuotaWatcher-v2/main/images/issue1.png)
+![步骤页面2](https://raw.githubusercontent.com/yinuo0602/AntigravityQuotaWatcher-v2/main/images/issue2.png)
 
 </details>
 

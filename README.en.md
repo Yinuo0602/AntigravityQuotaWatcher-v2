@@ -54,15 +54,15 @@ This project is fixed, stabilized, and functionally enhanced based on the origin
   <tr>
     <td align="center">
       <strong>Status Bar Display</strong><br><br>
-      <img src="https://raw.githubusercontent.com/wusimpl/AntigravityQuotaWatcher/main/images/demo1.png" alt="Status Bar Display" width="300">
+      <img src="https://raw.githubusercontent.com/yinuo0602/AntigravityQuotaWatcher-v2/main/images/demo1.png" alt="Status Bar Display" width="300">
     </td>
     <td align="center">
       <strong>Quota Details</strong><br><br>
-      <img src="https://raw.githubusercontent.com/wusimpl/AntigravityQuotaWatcher/main/images/demo2-en.png" alt="Quota Details" width="400">
+      <img src="https://raw.githubusercontent.com/yinuo0602/AntigravityQuotaWatcher-v2/main/images/demo2-en.png" alt="Quota Details" width="400">
     </td>
     <td align="center">
       <strong>Config Page<a href="./CONFIG.md">(Config Doc)</a></strong><br><br>
-      <img src="https://raw.githubusercontent.com/wusimpl/AntigravityQuotaWatcher/main/images/demo3.png" alt="Config Page" width="400">
+      <img src="https://raw.githubusercontent.com/yinuo0602/AntigravityQuotaWatcher-v2/main/images/demo3.png" alt="Config Page" width="400">
     </td>
   </tr>
 </table>
@@ -74,18 +74,9 @@ This project is fixed, stabilized, and functionally enhanced based on the origin
 ![Linux](https://img.shields.io/badge/Linux-supported-brightgreen?logo=linux&logoColor=white)
 ![Windows ARM](https://img.shields.io/badge/Windows--arm64-not%20supported-red?logo=microsoftwindows&logoColor=white)
 
-## Installation
+### Installation Steps
 
-
-### Method 1: Install from Open VSX Marketplace (Recommended)
-
-Search for `wusimpl Antigravity Quota Watcher @sort:name` in the extension marketplace. Look for the plugin by author `wusimpl` and then just click install.
-
-![OpenVSX-Search PNG](./images/openvsx-search.png)
-
-### Method 2: Manual Installation
-
-[Download the extension](https://github.com/wusimpl/AntigravityQuotaWatcher/releases/latest), install it, and restart Antigravity.
+[Download the extension](https://github.com/yinuo0602/AntigravityQuotaWatcher-v2/releases/latest), install it, and restart Antigravity.
 
 ![Installation](https://raw.githubusercontent.com/yinuo0602/AntigravityQuotaWatcher-v2/main/images/install.png)
 
@@ -101,8 +92,8 @@ Search for `wusimpl Antigravity Quota Watcher @sort:name` in the extension marke
 Please attach log files or log screenshots when submitting issues.
 
 How to export logs:
-![Step 1](https://raw.githubusercontent.com/wusimpl/AntigravityQuotaWatcher/main/images/issue1.png)
-![Step 2](https://raw.githubusercontent.com/wusimpl/AntigravityQuotaWatcher/main/images/issue2.png)
+![Step 1](https://raw.githubusercontent.com/yinuo0602/AntigravityQuotaWatcher-v2/main/images/issue1.png)
+![Step 2](https://raw.githubusercontent.com/yinuo0602/AntigravityQuotaWatcher-v2/main/images/issue2.png)
 
 </details>
 
