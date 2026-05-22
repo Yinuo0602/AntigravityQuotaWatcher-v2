@@ -104,7 +104,9 @@ export const zh_cn: TranslationMap = {
     'dashboard.quotaOverview': '配额概览',
     'dashboard.weeklyLimit': '周限检测',
     'dashboard.weeklyLimitWarning': '周限检测功能需要消耗少量额度，请勿频繁使用',
-    'dashboard.starBannerText': '如果觉得本项目有帮助，请给个 Star 支持一下！',
+    'dashboard.starBannerText': '如果觉得有帮助，请给个 Star 支持一下！',
+    'dashboard.thisProject': '本项目',
+    'dashboard.originalProject': '原地址',
 
     // 周限检测
     'weeklyLimit.checking': '正在检测 {model} 的周限状态...',

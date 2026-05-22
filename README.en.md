@@ -4,6 +4,10 @@
 
 ## Personal Upgrade Notes: Compatible with Antigravity IDE v2.0.1
 
+> [!NOTE]
+> This extension is an unofficial tool and has no affiliation with Antigravity.
+> This extension relies on internal implementation details of the Antigravity language server, and the related mechanisms may change at any time.
+
 This project is fixed, stabilized, and functionally enhanced based on the original author's extension:
 - **Original Author**: [wusimpl](https://github.com/wusimpl)
 - **Original Repository**: [https://github.com/wusimpl/AntigravityQuotaWatcher](https://github.com/wusimpl/AntigravityQuotaWatcher)
@@ -83,7 +87,7 @@ Search for `wusimpl Antigravity Quota Watcher @sort:name` in the extension marke
 
 [Download the extension](https://github.com/wusimpl/AntigravityQuotaWatcher/releases/latest), install it, and restart Antigravity.
 
-![Installation](https://raw.githubusercontent.com/wusimpl/AntigravityQuotaWatcher/main/images/install.png)
+![Installation](https://raw.githubusercontent.com/yinuo0602/AntigravityQuotaWatcher-v2/main/images/install.png)
 
 
 > [!NOTE]
@@ -121,7 +125,7 @@ Open the Dashboard panel via command palette `Antigravity Quota Watcher: Open Da
 - **Account Info**: Displays current logged-in account and subscription plan
 - **Quick Actions**: Refresh quota, re-detect port, login/logout, etc.
 
-<img src="https://raw.githubusercontent.com/wusimpl/AntigravityQuotaWatcher/main/images/dashboard.jpg" alt="Dashboard" width="500">
+<img src="https://raw.githubusercontent.com/yinuo0602/AntigravityQuotaWatcher-v2/main/images/dashboard.jpg" alt="Dashboard" width="500">
 
 <details>
 <summary><b>Weekly Limit Detection</b> (click to expand)</summary>
@@ -270,7 +274,7 @@ OR
  * Referenced the method for obtaining Antigravity local login account Token from [anti-quota](https://github.com/fhyfhy17/anti-quota). Thanks to the author for the contribution!
  * The weekly limit detection feature references the 2api method from [gcli2api](https://github.com/su-kaka/gcli2api). Thanks to the author for the contribution!
 
-[![Star History Chart](https://api.star-history.com/svg?repos=wusimpl/AntigravityQuotaWatcher&type=Date)](https://star-history.com/#wusimpl/AntigravityQuotaWatcher&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=Yinuo0602/AntigravityQuotaWatcher-v2&type=Date)](https://star-history.com/#Yinuo0602/AntigravityQuotaWatcher-v2&Date)
 
 ## Usage Agreement
 

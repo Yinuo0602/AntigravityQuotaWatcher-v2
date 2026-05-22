@@ -1,9 +1,9 @@
 {
-  "name": "antigravity-quota-watcher",
+  "name": "antigravity-quota-watcher-v2",
   "displayName": "Antigravity Quota Watcher",
   "description": "实时监控 Antigravity的模型使用配额（displays AI model quota status in the status bar）",
   "version": "2.0.1",
-  "publisher": "wusimpl",
+  "publisher": "yinuo",
   "icon": "icon.png",
   "engines": {
     "vscode": "^1.85.0"
@@ -218,7 +218,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/wusimpl/AntigravityQuotaWatcher.git"
+    "url": "https://github.com/Yinuo0602/AntigravityQuotaWatcher-v2.git"
   },
   "keywords": [
     "antigravity",
@@ -226,10 +226,10 @@
     "monitor",
     "ai"
   ],
-  "author": "wusimpl",
-  "homepage": "https://github.com/wusimpl/AntigravityQuotaWatcher",
+  "author": "壹诺",
+  "homepage": "https://github.com/Yinuo0602/AntigravityQuotaWatcher-v2",
   "bugs": {
-    "url": "https://github.com/wusimpl/AntigravityQuotaWatcher/issues"
+    "url": "https://github.com/Yinuo0602/AntigravityQuotaWatcher-v2/issues"
   },
   "license": "MIT"
 }

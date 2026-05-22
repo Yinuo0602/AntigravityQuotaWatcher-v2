@@ -104,7 +104,9 @@ export const en: TranslationMap = {
     'dashboard.quotaOverview': 'Quota Overview',
     'dashboard.weeklyLimit': 'Weekly Limit',
     'dashboard.weeklyLimitWarning': 'Weekly limit check consumes a small amount of quota. Please do not use frequently.',
-    'dashboard.starBannerText': 'If you find this project helpful, please give it a star!',
+    'dashboard.starBannerText': 'If you find this helpful, please give it a star!',
+    'dashboard.thisProject': 'This Project',
+    'dashboard.originalProject': 'Original',
 
     // Weekly Limit Check
     'weeklyLimit.checking': 'Checking weekly limit for {model}...',

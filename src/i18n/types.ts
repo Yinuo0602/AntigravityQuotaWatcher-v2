@@ -103,6 +103,8 @@ export type TranslationKey =
     | 'dashboard.weeklyLimit'
     | 'dashboard.weeklyLimitWarning'
     | 'dashboard.starBannerText'
+    | 'dashboard.thisProject'
+    | 'dashboard.originalProject'
 
     // Weekly Limit Check
     | 'weeklyLimit.checking'

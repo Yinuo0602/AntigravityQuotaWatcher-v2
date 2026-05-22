@@ -4,6 +4,12 @@
 
 ## 个人使用升级说明：兼容 Antigravity IDE v2.0.1 
 
+> [!NOTE]
+> 本插件为非官方工具，与 Antigravity 没有任何关联。
+> 本插件依赖于 Antigravity 语言服务器的内部实现细节，相关机制可能会随时变动。
+
+
+
 本项目基于原作者插件进行修复、稳定性和功能性增强：
 - **原作者**：[wusimpl](https://github.com/wusimpl)
 - **原项目地址**：[https://github.com/wusimpl/AntigravityQuotaWatcher](https://github.com/wusimpl/AntigravityQuotaWatcher)
@@ -42,7 +48,9 @@
 > **临时解决方案**：~~将代理节点设置为美国地区的节点~~,该方法目前似乎也已经失效，目前的配额递减规律是20%更新一次，100%->80%->60%...。
 
 > [!NOTE]
-> 号外号外！本仓库为vscode插件版，[桌面版](https://github.com/wusimpl/AntigravityQuotaWatcherDesktop)已发布，欢迎下载体验
+> 号外号外！本仓库为vscode插件，[原版桌面版](https://github.com/wusimpl/AntigravityQuotaWatcherDesktop)已发布，欢迎下载体验
+
+
 
 **一个在Antigravity状态栏实时显示AI模型配额剩余情况的插件。**
 
@@ -85,7 +93,7 @@
 
 [下载插件](https://github.com/wusimpl/AntigravityQuotaWatcher/releases/latest)，然后安装插件，重启 Antigravity
 
-![Installation](https://raw.githubusercontent.com/wusimpl/AntigravityQuotaWatcher/main/images/install.png)
+![Installation](https://raw.githubusercontent.com/yinuo0602/AntigravityQuotaWatcher-v2/main/images/install.png)
 
 > [!NOTE]
 > Linux系统平台须知：请确保系统支持以下三种命令之一：`lsof`、`netstat`、`ss`。如果没有，请安装后再重启IDE。
@@ -122,7 +130,7 @@
 - **账号信息**：显示当前登录账号和订阅计划
 - **快捷操作**：刷新配额、重新检测端口、登录/登出等
 
-<img src="https://raw.githubusercontent.com/wusimpl/AntigravityQuotaWatcher/main/images/dashboard.jpg" alt="Dashboard" width="500">
+<img src="https://raw.githubusercontent.com/yinuo0602/AntigravityQuotaWatcher-v2/main/images/dashboard.jpg" alt="Dashboard" width="500">
 
 <details>
 <summary><b>周限检测</b>（点击展开）</summary>
@@ -270,7 +278,9 @@
  * 参考了 [anti-quota](https://github.com/fhyfhy17/anti-quota) 获取 Antigravity 本地登录账号Token的方法，感谢作者的贡献！
  * 周限检测功能参考了 [gcli2api](https://github.com/su-kaka/gcli2api) 项目的 2api 方法，感谢作者的贡献！
 
-[![Star History Chart](https://api.star-history.com/svg?repos=wusimpl/AntigravityQuotaWatcher&type=date&legend=top-left)](https://www.star-history.com/#wusimpl/AntigravityQuotaWatcher&type=date&legend=top-left)
+[![Star History Chart](https://api.star-history.com/svg?repos=Yinuo0602/AntigravityQuotaWatcher-v2&type=date&legend=top-left)](https://www.star-history.com/#Yinuo0602/AntigravityQuotaWatcher-v2&type=date&legend=top-left)
+
+
 
 ## 项目使用约定
 

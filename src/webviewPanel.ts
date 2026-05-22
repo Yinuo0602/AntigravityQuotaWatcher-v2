@@ -440,8 +440,13 @@ export class WebviewPanelService {
             <div class="star-banner-content">
                 <span class="star-icon">⭐</span>
                 <span class="star-text">${t('dashboard.starBannerText')}</span>
-                <a class="star-link" href="https://github.com/wusimpl/AntigravityQuotaWatcher" target="_blank">
+                <span style="margin-left: 10px; font-weight: 500;">${t('dashboard.thisProject')}：</span>
+                <a class="star-link" href="https://github.com/Yinuo0602/AntigravityQuotaWatcher-v2" target="_blank">
                     GitHub ⭐
+                </a>
+                <span style="margin-left: 10px; font-weight: 500;">${t('dashboard.originalProject')}：</span>
+                <a class="star-link" href="https://github.com/wusimpl/AntigravityQuotaWatcher" target="_blank" style="background: rgba(255, 255, 255, 0.1); color: var(--vscode-foreground);">
+                    GitHub 🔗
                 </a>
             </div>
         </div>
