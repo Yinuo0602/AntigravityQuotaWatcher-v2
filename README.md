@@ -4,27 +4,35 @@
 
 ## 个人使用升级说明：兼容 Antigravity IDE v2.0.1 
 
-本项目基于原作者 [wusimpl](https://github.com/wusimpl) 的 Antigravity Quota Watcher([https://github.com/wusimpl/AntigravityQuotaWatcher](https://github.com/wusimpl/AntigravityQuotaWatcher)) 插件进行修复和增强：
+本项目基于原作者插件进行修复、稳定性和功能性增强：
+- **原作者**：[wusimpl](https://github.com/wusimpl)
+- **原项目地址**：[https://github.com/wusimpl/AntigravityQuotaWatcher](https://github.com/wusimpl/AntigravityQuotaWatcher)
+- **二次修复作者**：[壹诺](https://github.com/Yinuo0602)
+- **二次修复项目地址**：[https://github.com/Yinuo0602/AntigravityQuotaWatcher-v2](https://github.com/Yinuo0602/AntigravityQuotaWatcher-v2)
 
-### 修复内容（v2.0.1）
+### 修复与增强内容（v2.0.1 & v1.0.4）
 
-1. **API 请求字段修复**：移除了 Google API `metadata` 中不支持的字段（`os`、`extensionVersion`、`ideVersion`），解决了 "Invalid JSON payload received" 错误
-
-2. **多端点回退机制**：添加了三个 API 端点的故障转移机制（沙箱 → 日常 → 生产），提高配额获取的稳定性
-
-3. **增强的错误处理**：完善了 403 错误处理逻辑，支持自动重试和账号禁止访问状态标记
+1. **API 请求字段修复**：移除了 Google API `metadata` 中不支持的字段（`os`、`extensionVersion`、`ideVersion`），彻底解决了 "Invalid JSON payload received" 导致的接口请求报错。
+2. **多端点回退机制**：在配额获取中添加了三个 API 端点的智能故障转移与回退机制（沙箱 → 日常 → 生产），极大地提高了高并发或异常网络下配额获取的稳定性。
+3. **增强的错误与拦截处理**：完善了 403 错误重试逻辑，当包含 `project_id` 时可自动剥离并重试，并新增 `isForbidden` 拦截，在账号确被禁止访问时友好标记状态而不过度重试。
+4. **定时器泄露与竞态修复**：优化了 `QuotaService` 的生命周期，引入 `retryTimeout` 并确保在成功拉取或停止轮询 `stopPolling()` 时彻底清除重试定时器，避免后台线程堆积与异常请求发生。
+5. **Windows 平台高精度端口检测**：重构了 Windows 下 netstat 端口过滤指令，使用精准正则 `[ \t][ \t]*${pid}$` 代替模糊的子串过滤，杜绝了其它含 PID 字符的端口被误检测为 Language Server 的问题。
+6. **防 NaN 数据展示容错**：在配额的 `parseModelQuota` 解析和时间格式化 `formatTimeUntilReset` 中加入防御性 `isNaN` 检查，杜绝了状态栏因重置时间非法导致渲染 `"NaNs from now"` 的 UI 缺陷。
+7. **端口覆盖一致性修复**：修正 `setPorts` 方法，在新的 fallback 端口为 `undefined` 时确保能正确保留原有的 `httpPort`，不因覆盖导致连接断开。
 
 ### 修改文件清单
 
-| 文件 | 修改内容 |
-|------|----------|
-| `src/api/googleCloudCodeClient.ts` | 修复 API 请求字段错误 |
-| `src/api/antigravityClient.ts` | 修复 API 请求字段错误 |
-| `src/quotaService.ts` | 添加多端点回退机制、增强错误处理 |
-| `src/types.ts` | 添加 `isForbidden` 和 `forbiddenReason` 字段 |
-| `package.json` | 版本号升级到 2.0.1 |
+| 修改文件 | 涉及版本 | 修改说明 |
+|:---|:---:|:---|
+| `src/quotaService.ts` | `v1.0.4` & `v2.0.1` | 增加多端点智能故障转移，重构重试机制与 `retryTimeout` 清理，处理 NaN 数据防错，优化 `setPorts` 端口合并 |
+| `src/windowsProcessDetector.ts` | `v2.0.1` | 重构 Windows 原生端口过滤指令，将模糊 `findstr` 改为 `findstr /r` 严格正则完全匹配 PID，杜绝端口误配 |
+| `src/api/googleCloudCodeClient.ts` | `v1.0.4` | 移除 `loadProjectInfo` 中 metadata 的不支持字段，解决 "Cannot find field" 报错 |
+| `src/api/antigravityClient.ts` | `v1.0.4` | 移除 `buildMetadataBody` 中 metadata 的不支持字段 |
+| `src/types.ts` | `v1.0.4` | 新增 `isForbidden` 和 `forbiddenReason` 状态属性 |
+| `package.json` & `package-lock.json` | `v2.0.1` | 升级扩展版本号至 `2.0.1`，同步锁文件版本 |
+| `CHANGELOG.md` | `v2.0.1` | 补充完整的 v2.0.1 变更发布说明 |
 
-> **说明**：本二次修复版本保持原项目的 MIT 开源协议，代码出处为 [https://github.com/wusimpl/AntigravityQuotaWatcher](https://github.com/wusimpl/AntigravityQuotaWatcher)
+> **说明**：本二次修复版本保持原项目的 MIT 开源协议。
 
 > [!WARNING]
 > **关于配额不刷新（一直显示100%）问题的公告**

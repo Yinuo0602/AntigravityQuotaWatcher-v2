@@ -1,5 +1,39 @@
 # <img src="./icon.png" width="80" style="vertical-align: middle"> Antigravity Quota Watcher
 
+#### Choose Your Language:  [简体中文](./README.md) | English
+
+## Personal Upgrade Notes: Compatible with Antigravity IDE v2.0.1
+
+This project is fixed, stabilized, and functionally enhanced based on the original author's extension:
+- **Original Author**: [wusimpl](https://github.com/wusimpl)
+- **Original Repository**: [https://github.com/wusimpl/AntigravityQuotaWatcher](https://github.com/wusimpl/AntigravityQuotaWatcher)
+- **Second-Developer**: [壹诺 (Yinuo)](https://github.com/Yinuo0602)
+- **Forked Repository**: [https://github.com/Yinuo0602/AntigravityQuotaWatcher-v2](https://github.com/Yinuo0602/AntigravityQuotaWatcher-v2)
+
+### Fixes & Enhancements (v2.0.1 & v1.0.4)
+
+1. **API Request Payload Fix**: Removed unsupported fields (`os`, `extensionVersion`, `ideVersion`) from Google API `metadata`, completely resolving the "Invalid JSON payload received" API request error.
+2. **Multi-Endpoint Fallback Mechanism**: Added intelligent failover and fallback among three API endpoints (Sandbox → Daily → Production) during quota fetching, greatly improving stability under high concurrency or unstable network conditions.
+3. **Enhanced Error & Interception Handling**: Perfected the 403 error retry logic, allowing automatic peeling and retry when a `project_id` is present, and introduced an `isForbidden` state intercept to elegantly mark the status without excessive retries when account access is explicitly banned.
+4. **Timer Leak & Race Condition Fix**: Optimized the lifecycle of `QuotaService` by introducing `retryTimeout` and ensuring the retry timers are thoroughly cleared when successfully fetched or when polling is stopped (`stopPolling()`), preventing background thread pile-ups and duplicate abnormal requests.
+5. **High-Precision Port Detection on Windows**: Reconstructed the native `netstat` filtering logic on Windows to use the precise regular expression `[ \t][ \t]*${pid}$` instead of loose substring matching, preventing other ports containing the PID string from being misidentified as the Language Server.
+6. **Robust Defense against NaN rendering**: Added defensive `isNaN` checks in model quota parsing (`parseModelQuota`) and time formatting (`formatTimeUntilReset`), eliminating the UI defect of the status bar showing `"NaNs from now"` when encountering invalid reset times.
+7. **Consistent Port Overwrites**: Fixed the `setPorts` method to ensure the existing `httpPort` is preserved when the fallback port is `undefined`, avoiding unexpected connection drops caused by blank port overwrites.
+
+### File Modification List
+
+| Modified File | Target Versions | Description |
+|:---|:---:|:---|
+| `src/quotaService.ts` | `v1.0.4` & `v2.0.1` | Added multi-endpoint smart failover, refactored retry mechanism and `retryTimeout` cleanup, handled NaN data defense, and optimized `setPorts` port merging |
+| `src/windowsProcessDetector.ts` | `v2.0.1` | Refactored Windows native port filtering commands, replacing loose `findstr` with `findstr /r` strict regex matching PID to prevent port mis-detection |
+| `src/api/googleCloudCodeClient.ts` | `v1.0.4` | Removed unsupported metadata fields in `loadProjectInfo` to resolve the "Cannot find field" error |
+| `src/api/antigravityClient.ts` | `v1.0.4` | Removed unsupported metadata fields in `buildMetadataBody` |
+| `src/types.ts` | `v1.0.4` | Added `isForbidden` and `forbiddenReason` status properties |
+| `package.json` & `package-lock.json` | `v2.0.1` | Upgraded extension version to `2.0.1` and synchronized lockfile version |
+| `CHANGELOG.md` | `v2.0.1` | Supplemented detailed changelog for the `v2.0.1` release |
+
+---
+
 > [!WARNING]
 > **Notice: Quota Not Refreshing (Always Shows 100%)**
 >
