@@ -6,6 +6,13 @@ import { GoogleAuthService, AuthState } from "./auth";
 import { GoogleCloudCodeClient, GoogleApiError } from "./api";
 import { logger } from "./logger";
 
+// Quota API endpoints (fallback order: Sandbox → Daily → Prod)
+const QUOTA_API_ENDPOINTS = [
+  "https://daily-cloudcode-pa.sandbox.googleapis.com/v1internal:fetchAvailableModels",
+  "https://daily-cloudcode-pa.googleapis.com/v1internal:fetchAvailableModels",
+  "https://cloudcode-pa.googleapis.com/v1internal:fetchAvailableModels",
+];
+
 // API 方法枚举
 export enum QuotaApiMethod {
   //   COMMAND_MODEL_CONFIG = 'COMMAND_MODEL_CONFIG',
@@ -113,6 +120,7 @@ export class QuotaService {
   // Optional HTTP fallback port (extension_server_port)
   private httpPort?: number;
   private pollingInterval?: NodeJS.Timeout;
+  private retryTimeout?: NodeJS.Timeout;
   private updateCallback?: (snapshot: QuotaSnapshot) => void;
   private errorCallback?: (error: Error) => void;
   private statusCallback?: (status: 'fetching' | 'retrying', retryCount?: number) => void;
@@ -162,7 +170,7 @@ export class QuotaService {
 
   setPorts(connectPort: number, httpPort?: number): void {
     this.port = connectPort;
-    this.httpPort = httpPort ?? connectPort;
+    this.httpPort = httpPort ?? this.httpPort ?? connectPort;
     this.consecutiveErrors = 0;
     this.retryCount = 0;
   }
@@ -239,6 +247,11 @@ export class QuotaService {
       logger.info('QuotaService', 'Stopping polling loop');
       clearInterval(this.pollingInterval);
       this.pollingInterval = undefined;
+    }
+    if (this.retryTimeout) {
+      logger.info('QuotaService', 'Cancelling pending retry timeout');
+      clearTimeout(this.retryTimeout);
+      this.retryTimeout = undefined;
     }
   }
 
@@ -382,6 +395,10 @@ export class QuotaService {
       this.consecutiveErrors = 0;
       this.retryCount = 0;
       this.isFirstAttempt = false;
+      if (this.retryTimeout) {
+        clearTimeout(this.retryTimeout);
+        this.retryTimeout = undefined;
+      }
 
       // 清除过时标志 (仅 GOOGLE_API 方法)
       if (this.apiMethod === QuotaApiMethod.GOOGLE_API && this.staleCallback) {
@@ -452,7 +469,8 @@ export class QuotaService {
           this.statusCallback('retrying', this.retryCount);
         }
 
-        setTimeout(async () => {
+        this.retryTimeout = setTimeout(async () => {
+          this.retryTimeout = undefined;
           this.isRetrying = false;
           await this.fetchQuota();
         }, this.RETRY_DELAY_MS);
@@ -582,7 +600,7 @@ export class QuotaService {
   }
 
   /**
-   * 通过 Google API 直接获取配额
+   * 通过 Google API 直接获取配额（支持多端点回退）
    * 调用此方法前应确保已通过认证检查
    */
   private async fetchQuotaViaGoogleApi(): Promise<QuotaSnapshot> {
@@ -611,9 +629,9 @@ export class QuotaService {
       }
       logger.info('QuotaService', `Google API: Project loaded, tier=${projectInfo.tier}, projectId=${projectInfo.projectId || '(empty)'}`);
 
-      // 获取模型配额
+      // 获取模型配额（支持多端点回退）
       logger.debug('QuotaService', 'Google API: Fetching models quota...');
-      const modelsQuota = await this.googleApiClient.fetchModelsQuota(accessToken, projectInfo.projectId);
+      const modelsQuota = await this.fetchModelsQuotaWithFallback(accessToken, projectInfo.projectId);
       logger.info('QuotaService', `Google API: Models quota fetched, count=${modelsQuota.models.length}`);
 
       // 通知认证状态正常
@@ -630,7 +648,7 @@ export class QuotaService {
           label: model.displayName,
           modelId: model.modelName,
           remainingFraction: model.remainingQuota,
-          remainingPercentage: model.remainingQuota * 100,
+          remainingPercentage: model.remainingQuota !== undefined ? model.remainingQuota * 100 : undefined,
           isExhausted: model.isExhausted,
           resetTime,
           timeUntilReset,
@@ -645,6 +663,8 @@ export class QuotaService {
         planName: projectInfo.tier,
         userEmail,
         projectId: projectInfo.projectId,
+        isForbidden: modelsQuota.isForbidden,
+        forbiddenReason: modelsQuota.forbiddenReason,
       };
     } catch (error) {
       if (error instanceof GoogleApiError) {
@@ -660,19 +680,204 @@ export class QuotaService {
     }
   }
 
-  //   private parseCommandModelConfigsResponse(response: any): QuotaSnapshot {
-  //     const modelConfigs = response?.clientModelConfigs || [];
-  //     const models: ModelQuotaInfo[] = modelConfigs
-  //       .filter((config: any) => config.quotaInfo)
-  //       .map((config: any) => this.parseModelQuota(config));
-  // 
-  //     return {
-  //       timestamp: new Date(),
-  //       promptCredits: undefined,
-  //       models,
-  //       planName: undefined // CommandModelConfig API doesn't usually return plan info
-  //     };
-  //   }
+  /**
+   * 获取模型配额（带多端点回退机制）
+   */
+  private async fetchModelsQuotaWithFallback(accessToken: string, projectId?: string): Promise<ModelsQuotaResponse> {
+    let lastError: Error | undefined;
+    let payload: object;
+
+    // 构建请求体（如果有 project_id）
+    if (projectId) {
+      payload = { project: projectId };
+    } else {
+      payload = {}; // Empty payload fallback
+    }
+
+    for (let i = 0; i < QUOTA_API_ENDPOINTS.length; i++) {
+      const endpoint = QUOTA_API_ENDPOINTS[i];
+      const hasNext = i + 1 < QUOTA_API_ENDPOINTS.length;
+      let currentPayload = { ...payload };
+      let retryWithoutProject = false;
+      let shouldRetry = true;
+
+      while (shouldRetry) {
+        shouldRetry = false;
+        try {
+          logger.debug('QuotaService', `Fetching quota from endpoint ${i + 1}: ${endpoint}`);
+          
+          const response = await this.makeQuotaApiRequest(endpoint, accessToken, currentPayload);
+          
+          if (response.status === 403) {
+            // 403 Forbidden 处理：如果是带有 project_id 的请求，尝试剥离后重试
+            if (Object.prototype.hasOwnProperty.call(currentPayload, 'project') && !retryWithoutProject) {
+              logger.warn('QuotaService', 'Quota fetch got 403 with project ID, retrying without project ID...');
+              currentPayload = {};
+              retryWithoutProject = true;
+              shouldRetry = true;
+              continue;
+            }
+            
+            // 仍然返回 403，标记为禁止访问
+            logger.warn('QuotaService', 'Account unauthorized (403 Forbidden), marking as forbidden');
+            return {
+              models: [],
+              isForbidden: true,
+              forbiddenReason: response.body?.error?.message || '403 Forbidden',
+              modelForwardingRules: {},
+            };
+          }
+
+          if (response.status === 429 || (response.status >= 500 && response.status < 600)) {
+            // 429/5xx: fallback to next endpoint
+            if (hasNext) {
+              logger.warn('QuotaService', `Quota API ${endpoint} returned ${response.status}, falling back to next endpoint`);
+              lastError = new Error(`HTTP ${response.status}`);
+              await this.delay(1000);
+              break; // Break the inner retry loop, continue to next endpoint
+            }
+            throw new Error(`Quota API failed: HTTP ${response.status}`);
+          }
+
+          if (response.status !== 200) {
+            throw new Error(`API Error: ${response.status} - ${response.bodyText || 'Unknown error'}`);
+          }
+
+          // 成功获取到数据
+          if (i > 0) {
+            logger.info('QuotaService', `Quota API fallback succeeded at endpoint #${i + 1}`);
+          }
+
+          // 解析响应
+          return this.parseQuotaResponse(response.body);
+
+        } catch (error: any) {
+          logger.warn('QuotaService', `Quota API request failed at ${endpoint}: ${error.message}`);
+          lastError = error;
+          if (hasNext) {
+            await this.delay(1000);
+          }
+          break; // Break the inner retry loop on network error, continue to next endpoint
+        }
+      }
+    }
+
+    throw lastError || new Error('Quota fetch failed: all endpoints exhausted');
+  }
+
+  /**
+   * 发送配额 API 请求
+   */
+  private async makeQuotaApiRequest(endpoint: string, accessToken: string, payload: object): Promise<QuotaApiResponse> {
+    return new Promise((resolve, reject) => {
+      const url = new URL(endpoint);
+      const postData = JSON.stringify(payload);
+
+      const options: https.RequestOptions = {
+        hostname: url.hostname,
+        port: 443,
+        path: url.pathname + url.search,
+        method: 'POST',
+        timeout: 30000,
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(postData),
+          'Authorization': `Bearer ${accessToken}`,
+          'User-Agent': `AntigravityQuotaWatcher/${versionInfo.getExtensionVersion()} antigravity/${versionInfo.getIdeVersion()} ${versionInfo.getOs()}/amd64`,
+        },
+      };
+
+      const req = https.request(options, (res) => {
+        let body = '';
+        res.on('data', (chunk) => { body += chunk; });
+        res.on('end', () => {
+          let parsedBody: any;
+          try {
+            parsedBody = body ? JSON.parse(body) : {};
+          } catch {
+            parsedBody = {};
+          }
+          resolve({
+            status: res.statusCode || 500,
+            body: parsedBody,
+            bodyText: body,
+          });
+        });
+      });
+
+      req.on('error', (error) => reject(error));
+      req.on('timeout', () => { req.destroy(); reject(new Error('Request timed out')); });
+      req.write(postData);
+      req.end();
+    });
+  }
+
+  /**
+   * 解析配额响应
+   */
+  private parseQuotaResponse(response: any): ModelsQuotaResponse {
+    const models: any[] = [];
+    const modelForwardingRules: Record<string, string> = {};
+
+    interface ModelInfo {
+      quotaInfo?: {
+        remainingFraction?: number;
+        resetTime?: string;
+      };
+      displayName?: string;
+    }
+
+    interface DeprecatedInfo {
+      newModelId?: string;
+    }
+
+    // 解析模型配额
+    if (response.models && typeof response.models === 'object') {
+      for (const [name, info] of Object.entries<ModelInfo>(response.models)) {
+        if (info.quotaInfo) {
+          const remainingFraction = info.quotaInfo.remainingFraction;
+          const percentage = remainingFraction !== undefined ? remainingFraction * 100 : 0;
+          const resetTime = info.quotaInfo.resetTime || new Date().toISOString();
+
+          // 只保留我们关心的模型（排除内部聊天模型）
+          if (name.startsWith('gemini') || name.startsWith('claude') || 
+              name.startsWith('gpt') || name.startsWith('image') || name.startsWith('imagen')) {
+            models.push({
+              modelName: name,
+              displayName: info.displayName || name,
+              remainingQuota: remainingFraction,
+              remainingPercentage: percentage,
+              isExhausted: remainingFraction === undefined || remainingFraction === 0,
+              resetTime: resetTime,
+            });
+          }
+        }
+      }
+    }
+
+    // 解析已弃用模型的重定向规则
+    if (response.deprecatedModelIds && typeof response.deprecatedModelIds === 'object') {
+      for (const [oldId, info] of Object.entries<DeprecatedInfo>(response.deprecatedModelIds)) {
+        if (info.newModelId) {
+          modelForwardingRules[oldId] = info.newModelId;
+        }
+      }
+    }
+
+    return {
+      models,
+      isForbidden: false,
+      forbiddenReason: undefined,
+      modelForwardingRules,
+    };
+  }
+
+  /**
+   * 延迟辅助函数
+   */
+  private delay(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
 
   private parseGetUserStatusResponse(response: UserStatusResponse): QuotaSnapshot {
     if (!response || !response.userStatus) {
@@ -717,10 +922,11 @@ export class QuotaService {
   private parseModelQuota(config: any): ModelQuotaInfo {
     const quotaInfo = config.quotaInfo;
     const remainingFraction = quotaInfo?.remainingFraction;
-    const resetTime = new Date(quotaInfo.resetTime);
-    const timeUntilReset = resetTime.getTime() - Date.now();
+    const rawResetTime = quotaInfo?.resetTime || new Date().toISOString();
+    const resetTime = new Date(rawResetTime);
+    const timeUntilReset = isNaN(resetTime.getTime()) ? 0 : (resetTime.getTime() - Date.now());
 
-    logger.debug('QuotaService', `Model ${config.label}: resetTime=${quotaInfo.resetTime}, timeUntilReset=${timeUntilReset}ms (${timeUntilReset <= 0 ? 'EXPIRED' : 'valid'})`);
+    logger.debug('QuotaService', `Model ${config.label}: resetTime=${quotaInfo.resetTime || 'N/A'}, timeUntilReset=${timeUntilReset}ms (${timeUntilReset <= 0 ? 'EXPIRED' : 'valid'})`);
 
     return {
       label: config.label,
@@ -735,7 +941,7 @@ export class QuotaService {
   }
 
   private formatTimeUntilReset(ms: number): string {
-    if (ms <= 0) {
+    if (isNaN(ms) || ms <= 0) {
       return 'Expired';
     }
 
@@ -771,4 +977,25 @@ export class QuotaService {
   dispose(): void {
     this.stopPolling();
   }
+}
+
+// 内部类型定义
+interface QuotaApiResponse {
+  status: number;
+  body: any;
+  bodyText: string;
+}
+
+interface ModelsQuotaResponse {
+  models: {
+    modelName: string;
+    displayName: string;
+    remainingQuota: number | undefined;
+    remainingPercentage: number;
+    isExhausted: boolean;
+    resetTime: string;
+  }[];
+  isForbidden: boolean;
+  forbiddenReason?: string;
+  modelForwardingRules: Record<string, string>;
 }

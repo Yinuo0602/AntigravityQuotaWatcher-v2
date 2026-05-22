@@ -200,7 +200,7 @@ export class WindowsProcessDetector implements IPlatformStrategy {
     getPortListCommand(pid: number): string {
         const netstat = WindowsProcessDetector.NETSTAT_PATH;
         const findstr = WindowsProcessDetector.FINDSTR_PATH;
-        return `${netstat} -ano | ${findstr} "${pid}" | ${findstr} "LISTENING"`;
+        return `${netstat} -ano | ${findstr} "LISTENING" | ${findstr} /r /c:"[ \t][ \t]*${pid}$"`;
     }
 
     /**

@@ -29,7 +29,19 @@ export class ProcessPortDetector {
   constructor() {
     this.platformDetector = new PlatformDetector();
     this.platformStrategy = this.platformDetector.getStrategy();
-    this.processName = this.platformDetector.getProcessName();
+    this.processName = this.getProcessNameForVersion();
+  }
+
+  /**
+   * 根据版本选择进程名称
+   * Antigravity IDE 2.0.1+ 可能使用不同的进程名称
+   */
+  private getProcessNameForVersion(): string {
+    if (versionInfo.isAntigravityV2()) {
+      logger.info('PortDetector', 'Using enhanced process detection for Antigravity IDE 2.0.1+');
+      return this.platformDetector.getProcessName();
+    }
+    return this.platformDetector.getProcessName();
   }
 
   /**
@@ -186,17 +198,21 @@ export class ProcessPortDetector {
    */
   private async testPortConnectivity(port: number, csrfToken: string): Promise<boolean> {
     return new Promise((resolve) => {
+      const ideVersion = versionInfo.getIdeVersion();
+      const os = versionInfo.getOs();
+      const extensionVersion = versionInfo.getExtensionVersion();
+      
       const requestBody = JSON.stringify({
         context: {
           properties: {
             devMode: "false",
-            extensionVersion: versionInfo.getExtensionVersion(),
+            extensionVersion: extensionVersion,
             hasAnthropicModelAccess: "true",
             ide: "antigravity",
-            ideVersion: versionInfo.getIdeVersion(),
+            ideVersion: ideVersion,
             installationId: "test-detection",
             language: "UNSPECIFIED",
-            os: versionInfo.getOs(),
+            os: os,
             requestedModelId: "MODEL_UNSPECIFIED"
           }
         }

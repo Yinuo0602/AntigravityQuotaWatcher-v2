@@ -14,6 +14,7 @@ import {
 } from '../auth/constants';
 import { logger } from '../logger';
 import { ProxyService } from '../proxyService';
+import { versionInfo } from '../versionInfo';
 
 /**
  * 项目信息 (loadCodeAssist 响应)
@@ -94,7 +95,11 @@ export class GoogleCloudCodeClient {
      * @returns ProjectInfo
      */
     public async loadProjectInfo(accessToken: string): Promise<ProjectInfo> {
-        const requestBody = { metadata: { ideType: 'ANTIGRAVITY' } };
+        const requestBody = { 
+            metadata: { 
+                ideType: 'ANTIGRAVITY'
+            } 
+        };
         logger.debug('GoogleAPI', 'loadProjectInfo: Sending request', requestBody);
 
         const response = await this.makeApiRequest(
@@ -314,6 +319,12 @@ export class GoogleCloudCodeClient {
                 logger.debug('GoogleAPI', 'doRequest: Using proxy agent');
             }
 
+            // 构建 User-Agent，包含版本信息
+            const ideVersion = versionInfo.getIdeVersion();
+            const os = versionInfo.getOs();
+            const extensionVersion = versionInfo.getExtensionVersion();
+            const userAgent = `AntigravityQuotaWatcher/${extensionVersion} antigravity/${ideVersion} ${os}/amd64`;
+
             const options: https.RequestOptions = {
                 hostname: url.hostname,
                 port: 443,
@@ -325,7 +336,7 @@ export class GoogleCloudCodeClient {
                     'Content-Type': 'application/json',
                     'Content-Length': Buffer.byteLength(postData),
                     'Authorization': `Bearer ${accessToken}`,
-                    'User-Agent': 'AntigravityQuotaWatcher/1.0',
+                    'User-Agent': userAgent,
                 },
             };
 

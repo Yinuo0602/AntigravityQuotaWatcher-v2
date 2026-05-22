@@ -21,6 +21,8 @@ export interface VersionInfo {
     vscodeOssVersion: string;
     /** Operating system (e.g., "windows", "darwin", "linux") */
     os: string;
+    /** Whether this is Antigravity IDE 2.0.1 or later */
+    isAntigravityV2: boolean;
 }
 
 class VersionInfoService {
@@ -75,6 +77,9 @@ class VersionInfoService {
                 os = process.platform;
         }
 
+        // Check if this is Antigravity IDE 2.0.1 or later
+        const isAntigravityV2 = this.checkIsAntigravityV2(ideName, ideVersion);
+
         this.versionInfo = {
             extensionVersion,
             ideName,
@@ -82,9 +87,13 @@ class VersionInfoService {
             ideVersion,
             vscodeOssVersion,
             os,
+            isAntigravityV2,
         };
 
         logger.info('VersionInfo', `Initialized: ${this.getFullVersionString()}`);
+        if (isAntigravityV2) {
+            logger.info('VersionInfo', 'Detected Antigravity IDE 2.0.1 or later');
+        }
     }
 
     /**
@@ -151,6 +160,48 @@ class VersionInfoService {
             return 'VersionInfo not initialized';
         }
         return `Extension v${info.extensionVersion} on ${info.ideName} v${info.ideVersion} (VSCode OSS v${info.vscodeOssVersion})`;
+    }
+
+    /**
+     * Check if this is Antigravity IDE 2.0.1 or later
+     */
+    private checkIsAntigravityV2(ideName: string, ideVersion: string): boolean {
+        if (!ideName.toLowerCase().includes('antigravity')) {
+            return false;
+        }
+
+        try {
+            const versionParts = ideVersion.split('.').map(Number);
+            if (versionParts.length < 2) {
+                return false;
+            }
+
+            const major = versionParts[0];
+            const minor = versionParts[1];
+
+            // Check if version is 2.0.1 or later
+            if (major > 2) {
+                return true;
+            }
+            if (major === 2 && minor > 0) {
+                return true;
+            }
+            if (major === 2 && minor === 0 && versionParts.length >= 3 && versionParts[2] >= 1) {
+                return true;
+            }
+
+            return false;
+        } catch (e) {
+            logger.warn('VersionInfo', 'Failed to parse Antigravity version:', e);
+            return false;
+        }
+    }
+
+    /**
+     * Check if this is Antigravity IDE 2.0.1 or later
+     */
+    isAntigravityV2(): boolean {
+        return this.versionInfo?.isAntigravityV2 || false;
     }
 }
 

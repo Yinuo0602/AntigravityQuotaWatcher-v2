@@ -68,6 +68,8 @@ export interface QuotaSnapshot {
   userEmail?: string;  // Google 账号邮箱 (仅 GOOGLE_API 方法)
   projectId?: string;  // Google Cloud Project ID (仅 GOOGLE_API 方法)
   isStale?: boolean;   // 数据是否过时 (网络问题或超时)
+  isForbidden?: boolean;  // 账号是否被禁止访问 (403 Forbidden)
+  forbiddenReason?: string; // 禁止访问的原因
 }
 
 export enum QuotaLevel {

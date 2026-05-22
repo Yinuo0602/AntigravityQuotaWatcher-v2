@@ -1,6 +1,7 @@
 import * as https from 'https';
 import { logger } from '../logger';
 import { ProxyService } from '../proxyService';
+import { versionInfo } from '../versionInfo';
 
 const ANTIGRAVITY_API_BASE = 'https://daily-cloudcode-pa.sandbox.googleapis.com';
 const LOAD_CODE_ASSIST_PATH = '/v1internal:loadCodeAssist';
@@ -152,6 +153,12 @@ export class AntigravityClient {
             // 获取代理 Agent（如果配置了代理）
             const proxyAgent = ProxyService.getInstance().getAgentForHost(url.hostname);
 
+            // 构建 User-Agent，包含版本信息
+            const ideVersion = versionInfo.getIdeVersion();
+            const os = versionInfo.getOs();
+            const extensionVersion = versionInfo.getExtensionVersion();
+            const userAgent = `antigravity/${ideVersion} ${os}/amd64 AntigravityQuotaWatcher/${extensionVersion}`;
+
             const options: https.RequestOptions = {
                 hostname: url.hostname,
                 port: 443,
@@ -163,7 +170,7 @@ export class AntigravityClient {
                     'Content-Type': 'application/json',
                     'Content-Length': Buffer.byteLength(postData),
                     'Authorization': `Bearer ${accessToken}`,
-                    'User-Agent': 'antigravity/1.11.3 windows/amd64'
+                    'User-Agent': userAgent
                 }
             };
 

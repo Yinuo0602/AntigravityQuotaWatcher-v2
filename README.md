@@ -2,6 +2,30 @@
 
 #### Choose Your Language:  简体中文 | [English](./README.en.md)
 
+## 个人使用升级说明：兼容 Antigravity IDE v2.0.1 
+
+本项目基于原作者 [wusimpl](https://github.com/wusimpl) 的 Antigravity Quota Watcher([https://github.com/wusimpl/AntigravityQuotaWatcher](https://github.com/wusimpl/AntigravityQuotaWatcher)) 插件进行修复和增强：
+
+### 修复内容（v2.0.1）
+
+1. **API 请求字段修复**：移除了 Google API `metadata` 中不支持的字段（`os`、`extensionVersion`、`ideVersion`），解决了 "Invalid JSON payload received" 错误
+
+2. **多端点回退机制**：添加了三个 API 端点的故障转移机制（沙箱 → 日常 → 生产），提高配额获取的稳定性
+
+3. **增强的错误处理**：完善了 403 错误处理逻辑，支持自动重试和账号禁止访问状态标记
+
+### 修改文件清单
+
+| 文件 | 修改内容 |
+|------|----------|
+| `src/api/googleCloudCodeClient.ts` | 修复 API 请求字段错误 |
+| `src/api/antigravityClient.ts` | 修复 API 请求字段错误 |
+| `src/quotaService.ts` | 添加多端点回退机制、增强错误处理 |
+| `src/types.ts` | 添加 `isForbidden` 和 `forbiddenReason` 字段 |
+| `package.json` | 版本号升级到 2.0.1 |
+
+> **说明**：本二次修复版本保持原项目的 MIT 开源协议，代码出处为 [https://github.com/wusimpl/AntigravityQuotaWatcher](https://github.com/wusimpl/AntigravityQuotaWatcher)
+
 > [!WARNING]
 > **关于配额不刷新（一直显示100%）问题的公告**
 >
