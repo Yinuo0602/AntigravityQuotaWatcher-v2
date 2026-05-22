@@ -32,7 +32,7 @@
 | `package.json` & `package-lock.json` | `v2.0.1` | 升级扩展版本号至 `2.0.1`，同步锁文件版本 |
 | `CHANGELOG.md` | `v2.0.1` | 补充完整的 v2.0.1 变更发布说明 |
 
-> **说明**：本二次修复版本保持原项目的 MIT 开源协议。
+> **说明**：本二次修复版本保持原项目的 MIT 开源协议，代码出处为 [https://github.com/wusimpl/AntigravityQuotaWatcher](https://github.com/wusimpl/AntigravityQuotaWatcher)
 
 > [!WARNING]
 > **关于配额不刷新（一直显示100%）问题的公告**
@@ -277,9 +277,12 @@
 本项目基于 MIT 协议开源，使用此项目时请遵守开源协议。  
 除此外，希望你在使用代码时已经了解以下额外说明：
 
-1. 打包、二次分发 **请保留代码出处**：[https://github.com/wusimpl/AntigravityQuotaWatcher](https://github.com/wusimpl/AntigravityQuotaWatcher)
+1. 打包、二次分发 **请保留代码出处**：
+   - 原项目出处：[https://github.com/wusimpl/AntigravityQuotaWatcher](https://github.com/wusimpl/AntigravityQuotaWatcher)
+   - 二次修复项目出处：[https://github.com/Yinuo0602/AntigravityQuotaWatcher-v2](https://github.com/Yinuo0602/AntigravityQuotaWatcher-v2)
 2. 请不要用于商业用途，合法合规使用代码
 3. 如果开源协议变更，将在此 Github 仓库更新，不另行通知。
+
 
 ## 许可证
 

@@ -277,9 +277,12 @@ OR
 This project is open-sourced under the MIT License. Please comply with the open-source license when using this project.  
 In addition, we hope you are aware of the following additional notes when using the code:
 
-1. When packaging or redistributing, **please retain the source attribution**: [https://github.com/wusimpl/AntigravityQuotaWatcher](https://github.com/wusimpl/AntigravityQuotaWatcher)
+1. When packaging or redistributing, **please retain the source attribution**:
+   - Original Repository: [https://github.com/wusimpl/AntigravityQuotaWatcher](https://github.com/wusimpl/AntigravityQuotaWatcher)
+   - Forked Repository: [https://github.com/Yinuo0602/AntigravityQuotaWatcher-v2](https://github.com/Yinuo0602/AntigravityQuotaWatcher-v2)
 2. Please do not use for commercial purposes. Use the code legally and compliantly.
 3. If the open-source license changes, it will be updated in this GitHub repository without separate notice.
+
 
 ## License
 
